@@ -6,7 +6,7 @@
       <pane size="50">
         <splitpanes class="default-theme" vertical>
           <pane size="30">
-            <div class="panel-header">Item of schema with SyncRule ('_local')</div>
+            <div class="panel-header">Item Origin ('_local.fields')</div>
             <monaco-editor
               width="100%"
               height="100%"
@@ -18,7 +18,7 @@
             ></monaco-editor>
           </pane>
           <pane size="30">
-            <div class="panel-header">Item of linked schema</div>
+            <div class="panel-header">Item Target ('fields')</div>
             <monaco-editor
               width="100%"
               height="100%"
@@ -30,7 +30,7 @@
             ></monaco-editor>
           </pane>
           <pane size="40">
-            <div class="panel-header">SyncRule</div>
+            <div class="panel-header">Jsonata Expression</div>
             <monaco-editor
               width="100%"
               height="100%"
@@ -58,7 +58,15 @@
             ></monaco-editor>
           </pane>
           <pane size="50">
-            <div class="panel-header">Result</div>
+            <div class="panel-header with_select">
+              Result
+              <dropdown :options="jsonataOperations"
+                        :selected="jsonataOperation"
+                        v-on:updateOption="updateResult"
+                        :placeholder="'Jsonata Result'"
+                        :closeOnOutsideClick="boolean">
+              </dropdown>
+            </div>
             <monaco-editor
               width="100%"
               height="100%"
@@ -74,6 +82,7 @@
 </template>
 
 <script>
+import Dropdown from './Dropdown.vue';
 import Banner from './Banner.vue';
 
 const jsonata = require('jsonata');
@@ -83,9 +92,12 @@ export default {
   name: 'Dashboard',
   components: {
     Banner,
+    Dropdown,
   },
   data() {
     return {
+      jsonataOperations: [{ name: 'Jsonata Result' }, { name: 'MERGE result into origin' }, { name: 'ASSIGN into origin' }],
+      jsonataOperation: { name: 'Jsonata Result' },
       itemAValue: defaultValues.itemADefault,
       itemBValue: defaultValues.itemBDefault,
       syncRuleValue: defaultValues.syncRulesDefault,
@@ -175,14 +187,16 @@ export default {
     left: 0;
     display: block;
     width: 100%;
-    padding: 9px 0px;
+    padding: 9px 10px;
     background-color: #3498db;
     box-shadow: 0 5px 10px rgba(0,0,0,.1);
     color: #fff;
     font: 700 11px/1 'Lato', sans-serif;
     text-shadow: 0 1px 1px rgba(0,0,0,.2);
     text-transform: uppercase;
-    text-align: center;
+  }
+  .panel-header.with_select{
+    padding: 4px 10px;
   }
   .monaco_editor_container {
     position: absolute;
