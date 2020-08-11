@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <Dashboard/>
-    <ribbon></ribbon>
+    <Dashboard></Dashboard>
+    <Ribbon></Ribbon>
   </div>
 </template>
 
@@ -19,5 +19,5 @@ export default {
 </script>
 
 <style>
-  html, body, #app {height: 100%;margin: 0;}
+  html, body, #app {height: 100%; margin: 0;}
 </style>

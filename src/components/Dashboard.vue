@@ -59,12 +59,10 @@
           </pane>
           <pane size="50">
             <div class="panel-header with_select">
-              Result
               <dropdown :options="jsonataOperations"
                         :selected="jsonataOperation"
                         v-on:updateOption="updateResult"
-                        :placeholder="'Jsonata Result'"
-                        :closeOnOutsideClick="boolean">
+                        :placeholder="'Jsonata Result'">
               </dropdown>
             </div>
             <monaco-editor
@@ -96,7 +94,7 @@ export default {
   },
   data() {
     return {
-      jsonataOperations: [{ name: 'Jsonata Result' }, { name: 'MERGE result into origin' }, { name: 'ASSIGN into origin' }],
+      jsonataOperations: [{ name: 'Jsonata Result' }, { name: 'Merge Jsonata result into origin' }, { name: 'Assign Jsonata result into origin' }],
       jsonataOperation: { name: 'Jsonata Result' },
       itemAValue: defaultValues.itemADefault,
       itemBValue: defaultValues.itemBDefault,
@@ -104,10 +102,12 @@ export default {
       jsonataExtensionsValue: defaultValues.jsonataDefaultExtensions,
       jsonataResult: '',
       monaco_options: {
+        language: 'json',
         lineNumbers: 'off',
         automaticLayout: true,
         autoIndent: true,
         autoSurround: true,
+        glyphMargin: true,
         minimap: {
           enabled: false,
         },
@@ -173,7 +173,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
   .splitpanes__pane {
     box-shadow: 0 0 3px rgba(0, 0, 0, .2) inset;
     justify-content: center;
@@ -201,5 +201,14 @@ export default {
   .monaco_editor_container {
     position: absolute;
     top: 28px;
+  }
+  .default-theme.splitpanes .splitpanes .splitpanes__splitter {
+    width: 8px;
+    border-left: 1px solid #cacaca;
+    margin-left: -1px;
+    background-color: #efefef;
+  }
+  .vs .monaco-scrollable-element > .scrollbar > .slider {
+    background: rgba(100, 100, 100, .08);
   }
 </style>

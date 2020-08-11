@@ -81,14 +81,13 @@ export default {
 };
 </script>
 
-<style>
-
+<style scoped>
 .btn-group {
   background: #fff;
   border: solid 1px #137ec5;
   min-width: 160px;
   position: relative;
-  margin: -1px 24px 0px 24px;
+  margin: 0px 24px 0px 0px;
   display: inline-block;
   vertical-align: middle;
 }
@@ -99,7 +98,7 @@ export default {
 .dropdown-toggle {
   color: #252525;
   min-width: 160px;
-  padding: 5px 20px 5px 10px;
+  padding: 4px 20px 5px 10px;
   text-transform: none;
   font-weight: 300;
   border: 0;

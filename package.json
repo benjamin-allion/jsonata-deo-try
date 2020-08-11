@@ -1,10 +1,9 @@
 {
   "name": "jsonata-deo-try",
-  "author":
-  {
-    "name" : "Benjamin ALLION",
-    "email" : "benjamin.allion.pro@gmail.com",
-    "url" : "https://github.com/benjamin-allion"
+  "author": {
+    "name": "Benjamin ALLION",
+    "email": "benjamin.allion.pro@gmail.com",
+    "url": "https://github.com/benjamin-allion"
   },
   "version": "0.1.0",
   "private": true,
@@ -17,6 +16,7 @@
     "core-js": "^3.6.5",
     "jsonata": "^1.8.3",
     "monaco-editor-vue": "^1.0.10",
+    "monaco-editor-webpack-plugin": "^1.9.0",
     "splitpanes": "^2.2.1",
     "vue": "^2.6.11"
   },
