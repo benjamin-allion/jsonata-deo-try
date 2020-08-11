@@ -84,6 +84,7 @@ import Dropdown from './Dropdown.vue';
 import Banner from './Banner.vue';
 
 const jsonata = require('jsonata');
+const safeEval = require('safe-eval');
 const defaultValues = require('../data/defaultValues');
 
 export default {
@@ -157,7 +158,7 @@ export default {
       for (const extension of jsonataExtensions) {
         const singleLineCodeValue = extension.code.replace(/\n/g, '');
         // eslint-disable-next-line no-eval, no-loop-func
-        const extensionMethod = eval(singleLineCodeValue);
+        const extensionMethod = safeEval(singleLineCodeValue);
         expression.registerFunction(extension.name, extensionMethod);
         console.log(`JSONata Extension loaded for '${extension.name}'`);
         console.log(extensionMethod);
