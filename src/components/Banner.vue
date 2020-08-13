@@ -1,16 +1,17 @@
 <template>
-  <div id="banner">
-    <div id="banner-strip" class="bannerpart">
-      <div id="title">JSONata.Deo - Extension</div>
-      <div id="sample-selector">
-        <dropdown :options="sampleCollection"
-                  :selected="selectedSample"
-                  v-on:updateOption="chooseSample"
-                  :placeholder="'Choose an example...'">
-        </dropdown>
+    <div id="banner">
+      <div id="banner-strip" class="bannerpart">
+        <div id="title">JSONata.Deo - Extension</div>
+        <div id="sample-selector">
+          <dropdown :options="sampleCollection"
+                    :selected="selectedSample"
+                    float='right'
+                    v-on:updateOption="chooseSample"
+                    :placeholder="'Choose an example...'">
+          </dropdown>
+        </div>
       </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -39,6 +40,7 @@ export default {
 
 <style scoped>
   #banner {
+    z-index: 2;
     height: 100%;
     width: 100%;
     font-family: Source Sans Pro,sans-serif;
@@ -57,7 +59,6 @@ export default {
     padding: 8px;
   }
   #sample-selector {
-    z-index: 1000;
     position: fixed;
     top: 6px;
     right: -18px;

@@ -1,8 +1,7 @@
 <template>
     <splitpanes class="default-theme" horizontal>
-      <pane size="5">
-        <banner>
-        </banner>
+      <pane size="5" class="overflow-visible">
+        <banner/>
       </pane>
       <pane size="50">
         <splitpanes class="default-theme" vertical>
@@ -181,6 +180,9 @@ export default {
     align-items: center;
     display: flex;
     position: relative;
+  }
+  .overflow-visible {
+    overflow: visible;
   }
   .panel-header {
     position: absolute;
