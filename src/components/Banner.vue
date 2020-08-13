@@ -40,18 +40,18 @@ export default {
 <style scoped>
   #banner {
     height: 100%;
-    padding-top: 5px;
-    padding-bottom: 5px;
     width: 100%;
     font-family: Source Sans Pro,sans-serif;
     font-weight: 400;
     color: #fff;
     background-color: #285154;
-    overflow: auto;
   }
   #banner-strip {
-    display: flex;
-    justify-content: space-between;
+    margin: 0;
+    position: relative;
+    top: 50%;
+    -ms-transform: translateY(-50%);
+    transform: translateY(-50%);
   }
   #title {
     padding: 8px;
