@@ -63,9 +63,9 @@
           <pane size="50">
             <div class="panel-header with_select">
               <dropdown :options="jsonataOperations"
-                        :selected="jsonataOperation"
+                        :selected="resultType"
                         v-on:updateOption="updateResult"
-                        :placeholder="'Jsonata Result (B -> A)'">
+                        :placeholder="jsonataOperations[0].name">
               </dropdown>
             </div>
             <monaco-editor
@@ -74,7 +74,7 @@
               theme="vs"
               language="json"
               :options="monaco_result_options"
-              :value="jsonataResult"
+              :value="result"
             ></monaco-editor>
           </pane>
         </splitpanes>
@@ -86,8 +86,9 @@
 import Dropdown from './Dropdown.vue';
 import Banner from './Banner.vue';
 
-const jsonata = require('jsonata');
-const safeEval = require('safe-eval');
+const JsonataService = require('../services/jsonata');
+
+const { ResultTypes } = JsonataService;
 const sampleCollection = require('../data/sampleCollection');
 
 const defaultSample = sampleCollection[0];
@@ -100,13 +101,18 @@ export default {
   },
   data() {
     return {
-      jsonataOperations: [{ name: 'Jsonata Result (B -> A)' }, { name: 'Merge Jsonata result into A' }, { name: 'Assign Jsonata result into A' }],
-      jsonataOperation: { name: 'Jsonata Result (B -> A)' },
+      jsonataOperations: [
+        { name: 'Jsonata Result (New object)', value: ResultTypes.JSONATA },
+        { name: '_.merge Jsonata result (New object -> Item A)', value: ResultTypes.MERGE },
+        { name: '_.assign Jsonata result (New object -> Item A)', value: ResultTypes.ASSIGN },
+        { name: '_.extend Jsonata result (New object -> Item A)', value: ResultTypes.EXTEND },
+      ],
+      resultType: '',
       itemAValue: defaultSample.itemA,
       itemBValue: defaultSample.itemB,
       jsonataExpressionValue: defaultSample.jsonataExpression,
       jsonataExtensionsValue: defaultSample.jsonataExtensions,
-      jsonataResult: '',
+      result: '',
       monaco_options: {
         language: 'json',
         lineNumbers: 'off',
@@ -152,33 +158,21 @@ export default {
       this.jsonataExtensionsValue = value;
       this.updateResult();
     },
-    updateResult() {
-      const itemAJson = JSON.parse(this.itemAValue);
-      const itemBJson = JSON.parse(this.itemBValue);
-      const evaluatedItems = {
-        ...itemBJson,
-        _local: {
-          ...itemAJson,
-        },
-      };
-      const singleLineExtensionsValue = this.jsonataExtensionsValue.replace(/\n/g, '');
-      const jsonataExtensions = JSON.parse(singleLineExtensionsValue);
-
-      const expression = jsonata(this.jsonataExpressionValue);
-      // eslint-disable-next-line no-restricted-syntax
-      for (const extension of jsonataExtensions) {
-        const singleLineCodeValue = extension.code.replace(/\n/g, '');
-        // eslint-disable-next-line no-eval, no-loop-func
-        const extensionMethod = safeEval(singleLineCodeValue);
-        expression.registerFunction(extension.name, extensionMethod);
+    updateResult(resultType) {
+      if (resultType) {
+        this.resultType = resultType;
       }
-      this.jsonataResult = JSON.stringify(
-        expression.evaluate(evaluatedItems), null, 1,
+      const evaluatedObjects = {
+        itemA: JSON.parse(this.itemAValue),
+        itemB: JSON.parse(this.itemBValue),
+      };
+      this.result = JsonataService.getJsonataResult(
+        evaluatedObjects, this.jsonataExpressionValue, this.jsonataExtensionsValue, this.resultType,
       );
     },
   },
   mounted() {
-    this.updateResult();
+    this.updateResult(this.jsonataOperations[0]);
   },
 };
 </script>
