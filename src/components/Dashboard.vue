@@ -86,18 +86,12 @@
 import Dropdown from './Dropdown.vue';
 import Banner from './Banner.vue';
 
-const jsonata = require('jsonata');
-const _ = require('lodash');
-const safeEval = require('safe-eval');
+const JsonataService = require('../services/jsonata');
+
+const { ResultTypes } = JsonataService;
 const sampleCollection = require('../data/sampleCollection');
 
 const defaultSample = sampleCollection[0];
-const ResultTypes = {
-  JSONATA: 'jsonata',
-  MERGE: 'merge',
-  ASSIGN: 'assign',
-  EXTEND: 'extend',
-};
 
 export default {
   name: 'Dashboard',
@@ -172,55 +166,9 @@ export default {
         itemA: JSON.parse(this.itemAValue),
         itemB: JSON.parse(this.itemBValue),
       };
-      this.result = this.getResult(
+      this.result = JsonataService.getJsonataResult(
         evaluatedObjects, this.jsonataExpressionValue, this.jsonataExtensionsValue, this.resultType,
       );
-    },
-    getResult(evaluatedObjects, jsonataExpressionValue, jsonataExtensionsValue, resultType) {
-      const jsonataExpression = this.getJsonataExpression(
-        jsonataExpressionValue, jsonataExtensionsValue,
-      );
-      const evaluatedObject = {
-        ...evaluatedObjects.itemB,
-        _local: {
-          ...evaluatedObjects.itemA,
-        },
-      };
-      const jsonataResult = jsonataExpression.evaluate(evaluatedObject);
-      switch (resultType.value) {
-        case ResultTypes.JSONATA:
-          return JSON.stringify(jsonataResult, null, 1);
-        case ResultTypes.ASSIGN:
-          // eslint-disable-next-line no-case-declarations
-          const assignResult = _.assign(evaluatedObjects.itemA, jsonataResult);
-          return JSON.stringify(assignResult, null, 1);
-        case ResultTypes.MERGE:
-          // eslint-disable-next-line no-case-declarations
-          const mergeResult = _.merge(evaluatedObjects.itemA, jsonataResult);
-          return JSON.stringify(mergeResult, null, 1);
-        case ResultTypes.EXTEND:
-          // eslint-disable-next-line no-case-declarations
-          const extendResult = _.extend(evaluatedObjects.itemA, jsonataResult);
-          return JSON.stringify(extendResult, null, 1);
-        default:
-          return JSON.stringify(jsonataResult, null, 1);
-      }
-    },
-    getJsonataExpression(jsonataExpressionValue, jsonataExtensionsValue) {
-      const jsonataExtensions = this.getJsonataExtensions(jsonataExtensionsValue);
-      const expression = jsonata(jsonataExpressionValue);
-      // eslint-disable-next-line no-restricted-syntax
-      for (const extension of jsonataExtensions) {
-        const singleLineCodeValue = extension.code.replace(/\n/g, '');
-        // eslint-disable-next-line no-eval, no-loop-func
-        const extensionMethod = safeEval(singleLineCodeValue);
-        expression.registerFunction(extension.name, extensionMethod);
-      }
-      return expression;
-    },
-    getJsonataExtensions(jsonataExtensionsValue) {
-      const singleLineExtensionsValue = jsonataExtensionsValue.replace(/\n/g, '');
-      return JSON.parse(singleLineExtensionsValue);
     },
   },
   mounted() {
