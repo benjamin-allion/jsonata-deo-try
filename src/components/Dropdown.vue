@@ -4,13 +4,11 @@
           {{ selectedOption.name }}
           <span class="caret"></span>
         </li>
-
         <li @click="toggleMenu()" class="dropdown-toggle" v-if="selectedOption.name === undefined">
           {{placeholderText}}
           <span class="caret"></span>
         </li>
-
-        <ul class="dropdown-menu" v-if="showMenu">
+        <ul :class="getComponentClass()" v-if="showMenu">
             <li v-for="(option, idx) in options" :key="idx">
                 <a href="javascript:void(0)" @click="updateOption(option)">
                     {{ option.name }}
@@ -36,13 +34,13 @@ export default {
       type: [Array, Object],
     },
     selected: {},
+    float: String,
     placeholder: [String],
     closeOnOutsideClick: {
       type: [Boolean],
       default: true,
     },
   },
-
   mounted() {
     this.selectedOption = this.selected;
     if (this.placeholder) {
@@ -76,6 +74,9 @@ export default {
       if (!$el.contains(target)) {
         this.showMenu = false;
       }
+    },
+    getComponentClass() {
+      return this.float ? `dropdown-menu float-${this.float}` : 'dropdown-menu';
     },
   },
 };
@@ -132,6 +133,10 @@ export default {
   border-radius: 4px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   background-clip: padding-box;
+}
+.float-right {
+  left: auto;
+  right: 0;
 }
 
 .dropdown-menu > li > a {

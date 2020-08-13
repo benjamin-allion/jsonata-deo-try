@@ -1,12 +1,15 @@
 <template>
     <splitpanes class="default-theme" horizontal>
-      <pane size="5">
-        <banner></banner>
+      <pane size="5" class="overflow-visible">
+        <banner
+          v-on:sampleSelected = "sampleSelected"
+        >
+        </banner>
       </pane>
       <pane size="50">
         <splitpanes class="default-theme" vertical>
           <pane size="30">
-            <div class="panel-header">Item Origin ('_local.fields')</div>
+            <div class="panel-header">Item A - Origin ('_local.fields')</div>
             <monaco-editor
               width="100%"
               height="100%"
@@ -18,7 +21,7 @@
             ></monaco-editor>
           </pane>
           <pane size="30">
-            <div class="panel-header">Item Target ('fields')</div>
+            <div class="panel-header">Item B - Target ('fields')</div>
             <monaco-editor
               width="100%"
               height="100%"
@@ -37,8 +40,8 @@
               theme="vs"
               language="json"
               :options="monaco_options"
-              :value="syncRuleValue"
-              @change="syncRuleCodeChange"
+              :value="jsonataExpressionValue"
+              @change="jsonataExpressionCodeChange"
             ></monaco-editor>
           </pane>
         </splitpanes>
@@ -62,7 +65,7 @@
               <dropdown :options="jsonataOperations"
                         :selected="jsonataOperation"
                         v-on:updateOption="updateResult"
-                        :placeholder="'Jsonata Result'">
+                        :placeholder="'Jsonata Result (B -> A)'">
               </dropdown>
             </div>
             <monaco-editor
@@ -85,7 +88,9 @@ import Banner from './Banner.vue';
 
 const jsonata = require('jsonata');
 const safeEval = require('safe-eval');
-const defaultValues = require('../data/defaultValues');
+const sampleCollection = require('../data/sampleCollection');
+
+const defaultSample = sampleCollection[0];
 
 export default {
   name: 'Dashboard',
@@ -95,12 +100,12 @@ export default {
   },
   data() {
     return {
-      jsonataOperations: [{ name: 'Jsonata Result' }, { name: 'Merge Jsonata result into origin' }, { name: 'Assign Jsonata result into origin' }],
-      jsonataOperation: { name: 'Jsonata Result' },
-      itemAValue: defaultValues.itemADefault,
-      itemBValue: defaultValues.itemBDefault,
-      syncRuleValue: defaultValues.syncRulesDefault,
-      jsonataExtensionsValue: defaultValues.jsonataDefaultExtensions,
+      jsonataOperations: [{ name: 'Jsonata Result (B -> A)' }, { name: 'Merge Jsonata result into A' }, { name: 'Assign Jsonata result into A' }],
+      jsonataOperation: { name: 'Jsonata Result (B -> A)' },
+      itemAValue: defaultSample.itemA,
+      itemBValue: defaultSample.itemB,
+      jsonataExpressionValue: defaultSample.jsonataExpression,
+      jsonataExtensionsValue: defaultSample.jsonataExtensions,
       jsonataResult: '',
       monaco_options: {
         language: 'json',
@@ -125,6 +130,12 @@ export default {
     };
   },
   methods: {
+    sampleSelected(value) {
+      this.itemAValue = value.itemA;
+      this.itemBValue = value.itemB;
+      this.jsonataExpressionValue = value.jsonataExpression;
+      this.jsonataExtensionsValue = value.jsonataExtensions;
+    },
     itemACodeChange(value) {
       this.itemAValue = value;
       this.updateResult();
@@ -133,8 +144,8 @@ export default {
       this.itemBValue = value;
       this.updateResult();
     },
-    syncRuleCodeChange(value) {
-      this.syncRuleValue = value;
+    jsonataExpressionCodeChange(value) {
+      this.jsonataExpressionValue = value;
       this.updateResult();
     },
     jsonataExtensionsCodeChange(value) {
@@ -153,15 +164,13 @@ export default {
       const singleLineExtensionsValue = this.jsonataExtensionsValue.replace(/\n/g, '');
       const jsonataExtensions = JSON.parse(singleLineExtensionsValue);
 
-      const expression = jsonata(this.syncRuleValue);
+      const expression = jsonata(this.jsonataExpressionValue);
       // eslint-disable-next-line no-restricted-syntax
       for (const extension of jsonataExtensions) {
         const singleLineCodeValue = extension.code.replace(/\n/g, '');
         // eslint-disable-next-line no-eval, no-loop-func
         const extensionMethod = safeEval(singleLineCodeValue);
         expression.registerFunction(extension.name, extensionMethod);
-        console.log(`JSONata Extension loaded for '${extension.name}'`);
-        console.log(extensionMethod);
       }
       this.jsonataResult = JSON.stringify(
         expression.evaluate(evaluatedItems), null, 1,
@@ -174,13 +183,16 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
   .splitpanes__pane {
     box-shadow: 0 0 3px rgba(0, 0, 0, .2) inset;
     justify-content: center;
     align-items: center;
     display: flex;
     position: relative;
+  }
+  .overflow-visible {
+    overflow: visible;
   }
   .panel-header {
     position: absolute;
