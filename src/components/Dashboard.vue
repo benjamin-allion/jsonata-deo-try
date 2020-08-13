@@ -88,6 +88,9 @@ import Banner from './Banner.vue';
 
 const jsonata = require('jsonata');
 const safeEval = require('safe-eval');
+const sampleCollection = require('../data/sampleCollection');
+
+const defaultSample = sampleCollection[0];
 
 export default {
   name: 'Dashboard',
@@ -99,10 +102,10 @@ export default {
     return {
       jsonataOperations: [{ name: 'Jsonata Result (B -> A)' }, { name: 'Merge Jsonata result into A' }, { name: 'Assign Jsonata result into A' }],
       jsonataOperation: { name: 'Jsonata Result (B -> A)' },
-      itemAValue: '',
-      itemBValue: '',
-      jsonataExpressionValue: '',
-      jsonataExtensionsValue: '',
+      itemAValue: defaultSample.itemA,
+      itemBValue: defaultSample.itemB,
+      jsonataExpressionValue: defaultSample.jsonataExpression,
+      jsonataExtensionsValue: defaultSample.jsonataExtensions,
       jsonataResult: '',
       monaco_options: {
         language: 'json',
@@ -168,8 +171,6 @@ export default {
         // eslint-disable-next-line no-eval, no-loop-func
         const extensionMethod = safeEval(singleLineCodeValue);
         expression.registerFunction(extension.name, extensionMethod);
-        console.log(`JSONata Extension loaded for '${extension.name}'`);
-        console.log(extensionMethod);
       }
       this.jsonataResult = JSON.stringify(
         expression.evaluate(evaluatedItems), null, 1,
