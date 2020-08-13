@@ -1,7 +1,7 @@
 <template>
     <div id="banner">
       <div id="banner-strip" class="bannerpart">
-        <div id="title">JSONata.Deo - Extension</div>
+        <div id="title">JSONata.Deo - Extension - Try</div>
         <div id="sample-selector">
           <dropdown :options="sampleCollection"
                     :selected="selectedSample"
@@ -32,7 +32,7 @@ export default {
   },
   methods: {
     chooseSample(value) {
-      console.log(value);
+      this.$emit('sampleSelected', value);
     },
   },
 };

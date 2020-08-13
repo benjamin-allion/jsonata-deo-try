@@ -1,7 +1,10 @@
 <template>
     <splitpanes class="default-theme" horizontal>
       <pane size="5" class="overflow-visible">
-        <banner/>
+        <banner
+          v-on:sampleSelected = "sampleSelected"
+        >
+        </banner>
       </pane>
       <pane size="50">
         <splitpanes class="default-theme" vertical>
@@ -37,8 +40,8 @@
               theme="vs"
               language="json"
               :options="monaco_options"
-              :value="syncRuleValue"
-              @change="syncRuleCodeChange"
+              :value="jsonataExpressionValue"
+              @change="jsonataExpressionCodeChange"
             ></monaco-editor>
           </pane>
         </splitpanes>
@@ -98,7 +101,7 @@ export default {
       jsonataOperation: { name: 'Jsonata Result (B -> A)' },
       itemAValue: '',
       itemBValue: '',
-      syncRuleValue: '',
+      jsonataExpressionValue: '',
       jsonataExtensionsValue: '',
       jsonataResult: '',
       monaco_options: {
@@ -124,6 +127,12 @@ export default {
     };
   },
   methods: {
+    sampleSelected(value) {
+      this.itemAValue = value.itemA;
+      this.itemBValue = value.itemB;
+      this.jsonataExpressionValue = value.jsonataExpression;
+      this.jsonataExtensionsValue = value.jsonataExtensions;
+    },
     itemACodeChange(value) {
       this.itemAValue = value;
       this.updateResult();
@@ -132,8 +141,8 @@ export default {
       this.itemBValue = value;
       this.updateResult();
     },
-    syncRuleCodeChange(value) {
-      this.syncRuleValue = value;
+    jsonataExpressionCodeChange(value) {
+      this.jsonataExpressionValue = value;
       this.updateResult();
     },
     jsonataExtensionsCodeChange(value) {
@@ -152,7 +161,7 @@ export default {
       const singleLineExtensionsValue = this.jsonataExtensionsValue.replace(/\n/g, '');
       const jsonataExtensions = JSON.parse(singleLineExtensionsValue);
 
-      const expression = jsonata(this.syncRuleValue);
+      const expression = jsonata(this.jsonataExpressionValue);
       // eslint-disable-next-line no-restricted-syntax
       for (const extension of jsonataExtensions) {
         const singleLineCodeValue = extension.code.replace(/\n/g, '');
