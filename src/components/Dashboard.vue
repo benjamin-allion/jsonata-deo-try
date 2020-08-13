@@ -63,9 +63,9 @@
           <pane size="50">
             <div class="panel-header with_select">
               <dropdown :options="jsonataOperations"
-                        :selected="jsonataOperation"
+                        :selected="resultType"
                         v-on:updateOption="updateResult"
-                        :placeholder="'Jsonata Result (B -> A)'">
+                        :placeholder="jsonataOperations[0].name">
               </dropdown>
             </div>
             <monaco-editor
@@ -74,7 +74,7 @@
               theme="vs"
               language="json"
               :options="monaco_result_options"
-              :value="jsonataResult"
+              :value="result"
             ></monaco-editor>
           </pane>
         </splitpanes>
@@ -91,6 +91,11 @@ const safeEval = require('safe-eval');
 const sampleCollection = require('../data/sampleCollection');
 
 const defaultSample = sampleCollection[0];
+const ResultTypes = {
+  JSONATA: 'jsonata',
+  MERGE: 'merge',
+  ASSIGN: 'assign',
+};
 
 export default {
   name: 'Dashboard',
@@ -100,13 +105,17 @@ export default {
   },
   data() {
     return {
-      jsonataOperations: [{ name: 'Jsonata Result (B -> A)' }, { name: 'Merge Jsonata result into A' }, { name: 'Assign Jsonata result into A' }],
-      jsonataOperation: { name: 'Jsonata Result (B -> A)' },
+      jsonataOperations: [
+        { name: 'Jsonata Result (New object)', value: ResultTypes.JSONATA },
+        { name: 'Merge Jsonata result (New object -> Item A)', value: ResultTypes.MERGE },
+        { name: 'Assign Jsonata result (New object -> Item A)', value: ResultTypes.ASSIGN },
+      ],
+      resultType: '',
       itemAValue: defaultSample.itemA,
       itemBValue: defaultSample.itemB,
       jsonataExpressionValue: defaultSample.jsonataExpression,
       jsonataExtensionsValue: defaultSample.jsonataExtensions,
-      jsonataResult: '',
+      result: '',
       monaco_options: {
         language: 'json',
         lineNumbers: 'off',
@@ -152,19 +161,40 @@ export default {
       this.jsonataExtensionsValue = value;
       this.updateResult();
     },
-    updateResult() {
+    updateResult(resultType) {
+      this.resultType = resultType;
       const itemAJson = JSON.parse(this.itemAValue);
       const itemBJson = JSON.parse(this.itemBValue);
-      const evaluatedItems = {
+      const evaluatedObject = {
         ...itemBJson,
         _local: {
           ...itemAJson,
         },
       };
-      const singleLineExtensionsValue = this.jsonataExtensionsValue.replace(/\n/g, '');
-      const jsonataExtensions = JSON.parse(singleLineExtensionsValue);
-
-      const expression = jsonata(this.jsonataExpressionValue);
+      this.result = this.getResult(
+        evaluatedObject, this.jsonataExpressionValue, this.jsonataExtensionsValue, this.resultType,
+      );
+    },
+    getResult(evaluatedObject, jsonataExpressionValue, jsonataExtensionsValue, resultType) {
+      const jsonataExpression = this.getJsonataExpression(
+        jsonataExpressionValue, jsonataExtensionsValue,
+      );
+      switch (resultType.value) {
+        case ResultTypes.JSONATA:
+          return JSON.stringify(
+            jsonataExpression.evaluate(evaluatedObject), null, 1,
+          );
+        case ResultTypes.MERGE:
+          return JSON.stringify(
+            jsonataExpression.evaluate(evaluatedObject), null, 1,
+          );
+        default:
+          return 'test';
+      }
+    },
+    getJsonataExpression(jsonataExpressionValue, jsonataExtensionsValue) {
+      const jsonataExtensions = this.getJsonataExtensions(jsonataExtensionsValue);
+      const expression = jsonata(jsonataExpressionValue);
       // eslint-disable-next-line no-restricted-syntax
       for (const extension of jsonataExtensions) {
         const singleLineCodeValue = extension.code.replace(/\n/g, '');
@@ -172,13 +202,15 @@ export default {
         const extensionMethod = safeEval(singleLineCodeValue);
         expression.registerFunction(extension.name, extensionMethod);
       }
-      this.jsonataResult = JSON.stringify(
-        expression.evaluate(evaluatedItems), null, 1,
-      );
+      return expression;
+    },
+    getJsonataExtensions(jsonataExtensionsValue) {
+      const singleLineExtensionsValue = jsonataExtensionsValue.replace(/\n/g, '');
+      return JSON.parse(singleLineExtensionsValue);
     },
   },
   mounted() {
-    this.updateResult();
+    this.updateResult(this.jsonataOperations[0]);
   },
 };
 </script>
