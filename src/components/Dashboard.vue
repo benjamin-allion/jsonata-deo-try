@@ -182,7 +182,7 @@ export default {
 };
 </script>
 
-<style scope>
+<style>
   .splitpanes__pane {
     box-shadow: 0 0 3px rgba(0, 0, 0, .2) inset;
     justify-content: center;
