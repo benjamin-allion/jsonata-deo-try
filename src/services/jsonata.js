@@ -22,6 +22,7 @@ const _convertToSingleLine = (value) => value.replace(/\n/g, '');
  * @returns {object}
  */
 const _getJsonataExtensions = (jsonataExtensionsValue) => {
+  if (!jsonataExtensionsValue) { return []; }
   const singleLineExtensionsValue = _convertToSingleLine(jsonataExtensionsValue);
   return JSON.parse(singleLineExtensionsValue);
 };
