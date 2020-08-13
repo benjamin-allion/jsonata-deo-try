@@ -3,51 +3,25 @@ const sampleCollection = [{
   itemA:
 `{
   "fields": {
-    "firstName": "FIRSTNAME"
+    "firstName": "John",
+    "birthDate": "1886-10-04"
   }
 }`,
   itemB:
 `{
   "fields": {
-    "lastName": "lastname"
+    "lastName": "Jax"
   }
 }`,
   jsonataExpression:
 `{
-  "firstName": $toLowerCase(_local.fields.firstName),
-  "lastName": $toUpperCase(fields.lastName)
+  "fields": {
+    "firstName": $toLowerCase(_local.fields.firstName),
+    "lastName": $toUpperCase(fields.lastName)
+  }
 }`,
   jsonataExtensions:
 `[{
-  "name": "toUpperCase",
-  "code": "(value) => value.toUpperCase();"
-},
-{
-  "name": "toLowerCase",
-  "code": "(value) => value.toLowerCase();"
-}]`,
-},
-{
-  name: 'Sample fields injection from A to B',
-  itemA:
-      `{
-  "fields": {
-    "firstName": "FIRSTNAME"
-  }
-}`,
-  itemB:
-      `{
-  "fields": {
-    "lastName": "lastname"
-  }
-}`,
-  jsonataExpression:
-      `{
-  "firstName": $toLowerCase(_local.fields.firstName),
-  "lastName": $toUpperCase(fields.lastName)
-}`,
-  jsonataExtensions:
-      `[{
   "name": "toUpperCase",
   "code": "(value) => value.toUpperCase();"
 },
