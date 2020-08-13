@@ -1,12 +1,13 @@
 <template>
     <splitpanes class="default-theme" horizontal>
       <pane size="5">
-        <banner></banner>
+        <banner>
+        </banner>
       </pane>
       <pane size="50">
         <splitpanes class="default-theme" vertical>
           <pane size="30">
-            <div class="panel-header">Item Origin ('_local.fields')</div>
+            <div class="panel-header">Item A - Origin ('_local.fields')</div>
             <monaco-editor
               width="100%"
               height="100%"
@@ -18,7 +19,7 @@
             ></monaco-editor>
           </pane>
           <pane size="30">
-            <div class="panel-header">Item Target ('fields')</div>
+            <div class="panel-header">Item B - Target ('fields')</div>
             <monaco-editor
               width="100%"
               height="100%"
@@ -62,7 +63,7 @@
               <dropdown :options="jsonataOperations"
                         :selected="jsonataOperation"
                         v-on:updateOption="updateResult"
-                        :placeholder="'Jsonata Result'">
+                        :placeholder="'Jsonata Result (B -> A)'">
               </dropdown>
             </div>
             <monaco-editor
@@ -85,7 +86,6 @@ import Banner from './Banner.vue';
 
 const jsonata = require('jsonata');
 const safeEval = require('safe-eval');
-const defaultValues = require('../data/defaultValues');
 
 export default {
   name: 'Dashboard',
@@ -95,12 +95,12 @@ export default {
   },
   data() {
     return {
-      jsonataOperations: [{ name: 'Jsonata Result' }, { name: 'Merge Jsonata result into origin' }, { name: 'Assign Jsonata result into origin' }],
-      jsonataOperation: { name: 'Jsonata Result' },
-      itemAValue: defaultValues.itemADefault,
-      itemBValue: defaultValues.itemBDefault,
-      syncRuleValue: defaultValues.syncRulesDefault,
-      jsonataExtensionsValue: defaultValues.jsonataDefaultExtensions,
+      jsonataOperations: [{ name: 'Jsonata Result (B -> A)' }, { name: 'Merge Jsonata result into A' }, { name: 'Assign Jsonata result into A' }],
+      jsonataOperation: { name: 'Jsonata Result (B -> A)' },
+      itemAValue: '',
+      itemBValue: '',
+      syncRuleValue: '',
+      jsonataExtensionsValue: '',
       jsonataResult: '',
       monaco_options: {
         language: 'json',
@@ -174,7 +174,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style scope>
   .splitpanes__pane {
     box-shadow: 0 0 3px rgba(0, 0, 0, .2) inset;
     justify-content: center;
