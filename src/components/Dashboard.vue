@@ -87,6 +87,7 @@ import Dropdown from './Dropdown.vue';
 import Banner from './Banner.vue';
 
 const jsonata = require('jsonata');
+const _ = require('lodash');
 const safeEval = require('safe-eval');
 const sampleCollection = require('../data/sampleCollection');
 
@@ -95,6 +96,7 @@ const ResultTypes = {
   JSONATA: 'jsonata',
   MERGE: 'merge',
   ASSIGN: 'assign',
+  EXTEND: 'extend',
 };
 
 export default {
@@ -107,8 +109,9 @@ export default {
     return {
       jsonataOperations: [
         { name: 'Jsonata Result (New object)', value: ResultTypes.JSONATA },
-        { name: 'Merge Jsonata result (New object -> Item A)', value: ResultTypes.MERGE },
-        { name: 'Assign Jsonata result (New object -> Item A)', value: ResultTypes.ASSIGN },
+        { name: '_.merge Jsonata result (New object -> Item A)', value: ResultTypes.MERGE },
+        { name: '_.assign Jsonata result (New object -> Item A)', value: ResultTypes.ASSIGN },
+        { name: '_.extend Jsonata result (New object -> Item A)', value: ResultTypes.EXTEND },
       ],
       resultType: '',
       itemAValue: defaultSample.itemA,
@@ -162,34 +165,45 @@ export default {
       this.updateResult();
     },
     updateResult(resultType) {
-      this.resultType = resultType;
-      const itemAJson = JSON.parse(this.itemAValue);
-      const itemBJson = JSON.parse(this.itemBValue);
-      const evaluatedObject = {
-        ...itemBJson,
-        _local: {
-          ...itemAJson,
-        },
+      if (resultType) {
+        this.resultType = resultType;
+      }
+      const evaluatedObjects = {
+        itemA: JSON.parse(this.itemAValue),
+        itemB: JSON.parse(this.itemBValue),
       };
       this.result = this.getResult(
-        evaluatedObject, this.jsonataExpressionValue, this.jsonataExtensionsValue, this.resultType,
+        evaluatedObjects, this.jsonataExpressionValue, this.jsonataExtensionsValue, this.resultType,
       );
     },
-    getResult(evaluatedObject, jsonataExpressionValue, jsonataExtensionsValue, resultType) {
+    getResult(evaluatedObjects, jsonataExpressionValue, jsonataExtensionsValue, resultType) {
       const jsonataExpression = this.getJsonataExpression(
         jsonataExpressionValue, jsonataExtensionsValue,
       );
+      const evaluatedObject = {
+        ...evaluatedObjects.itemB,
+        _local: {
+          ...evaluatedObjects.itemA,
+        },
+      };
+      const jsonataResult = jsonataExpression.evaluate(evaluatedObject);
       switch (resultType.value) {
         case ResultTypes.JSONATA:
-          return JSON.stringify(
-            jsonataExpression.evaluate(evaluatedObject), null, 1,
-          );
+          return JSON.stringify(jsonataResult, null, 1);
+        case ResultTypes.ASSIGN:
+          // eslint-disable-next-line no-case-declarations
+          const assignResult = _.assign(evaluatedObjects.itemA, jsonataResult);
+          return JSON.stringify(assignResult, null, 1);
         case ResultTypes.MERGE:
-          return JSON.stringify(
-            jsonataExpression.evaluate(evaluatedObject), null, 1,
-          );
+          // eslint-disable-next-line no-case-declarations
+          const mergeResult = _.merge(evaluatedObjects.itemA, jsonataResult);
+          return JSON.stringify(mergeResult, null, 1);
+        case ResultTypes.EXTEND:
+          // eslint-disable-next-line no-case-declarations
+          const extendResult = _.extend(evaluatedObjects.itemA, jsonataResult);
+          return JSON.stringify(extendResult, null, 1);
         default:
-          return 'test';
+          return JSON.stringify(jsonataResult, null, 1);
       }
     },
     getJsonataExpression(jsonataExpressionValue, jsonataExtensionsValue) {
