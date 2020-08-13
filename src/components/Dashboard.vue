@@ -1,15 +1,12 @@
 <template>
     <splitpanes class="default-theme" horizontal>
       <pane size="5" class="overflow-visible">
-        <banner
-          v-on:sampleSelected = "sampleSelected"
-        >
-        </banner>
+        <banner v-on:sampleSelected = "sampleSelected"></banner>
       </pane>
       <pane size="50">
         <splitpanes class="default-theme" vertical>
           <pane size="30">
-            <div class="panel-header">Item A - Origin ('_local.fields')</div>
+            <div class="panel-header">{{ $t('panelHeaders.itemA') }}</div>
             <monaco-editor
               width="100%"
               height="100%"
@@ -21,7 +18,7 @@
             ></monaco-editor>
           </pane>
           <pane size="30">
-            <div class="panel-header">Item B - Target ('fields')</div>
+            <div class="panel-header">{{ $t('panelHeaders.itemB') }}</div>
             <monaco-editor
               width="100%"
               height="100%"
@@ -33,7 +30,7 @@
             ></monaco-editor>
           </pane>
           <pane size="40">
-            <div class="panel-header">Jsonata Expression</div>
+            <div class="panel-header">{{ $t('panelHeaders.jsonataExpression') }}</div>
             <monaco-editor
               width="100%"
               height="100%"
@@ -49,7 +46,7 @@
       <pane size="45">
         <splitpanes class="default-theme" vertical>
           <pane size="50">
-            <div class="panel-header">Jsonata Extensions</div>
+            <div class="panel-header">{{ $t('panelHeaders.jsonataExtensions') }}</div>
             <monaco-editor
               width="100%"
               height="100%"
@@ -102,10 +99,10 @@ export default {
   data() {
     return {
       jsonataOperations: [
-        { name: 'Jsonata Result (New object)', value: ResultTypes.JSONATA },
-        { name: '_.merge Jsonata result (New object -> Item A)', value: ResultTypes.MERGE },
-        { name: '_.assign Jsonata result (New object -> Item A)', value: ResultTypes.ASSIGN },
-        { name: '_.extend Jsonata result (New object -> Item A)', value: ResultTypes.EXTEND },
+        { name: this.$i18n.t('result.generatedObject'), value: ResultTypes.JSONATA },
+        { name: this.$i18n.t('result.merge'), value: ResultTypes.MERGE },
+        { name: this.$i18n.t('result.assign'), value: ResultTypes.ASSIGN },
+        { name: this.$i18n.t('result.extend'), value: ResultTypes.EXTEND },
       ],
       resultType: '',
       itemAValue: defaultSample.itemA,

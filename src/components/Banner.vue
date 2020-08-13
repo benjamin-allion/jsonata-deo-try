@@ -1,13 +1,13 @@
 <template>
     <div id="banner">
       <div id="banner-strip" class="bannerpart">
-        <div id="title">JSONata.Deo - Extension - Try</div>
+        <div id="title">{{ $t('header.title') }}</div>
         <div id="sample-selector">
           <dropdown :options="sampleCollection"
                     :selected="selectedSample"
                     float='right'
                     v-on:updateOption="chooseSample"
-                    :placeholder="'Choose an example...'">
+                    :placeholder="this.$i18n.t('header.selectExample')">
           </dropdown>
         </div>
       </div>
